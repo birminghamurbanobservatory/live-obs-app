@@ -1,7 +1,7 @@
 <nav class="flex items-center justify-between flex-wrap bg-teal-500 p-6">
 
   <a href="https://birminghamurbanobservatory.com" class="flex items-center flex-shrink-0 text-white mr-6">
-    <img class="h-7 w-7 mr-2" src="/assets/buo-logo.svg" alt="">
+    <img style="height: 30px" class="mr-2" src="/assets/buo-logo.svg" alt="">
     <span class="font-semibold text-sm sm:text-xl tracking-tight">Birmingham Urban Observatory</span>
   </a>
 
@@ -13,6 +13,9 @@
    
   <div [ngClass]="{'block': navDroppedDown, 'hidden': !navDroppedDown}" class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
     <div class="text-sm lg:flex-grow">
+      <a href="https://data.birminghamurbanobservatory.com" class="block lg:inline-block lg:mt-0 text-teal-200 hover:text-white no-underline mt-4 mr-4">
+        Data
+      </a>
       <a href="https://birminghamurbanobservatory.com/about" class="block lg:inline-block lg:mt-0 text-teal-200 hover:text-white no-underline mt-4 mr-4">
         About Us
       </a>

@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  apiUrl: 'https://api.birminghamurbanobservatory.com',
+  logLevel: 'warn' // off, debug, info, warn, error
 };

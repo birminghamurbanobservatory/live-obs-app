@@ -1,1 +1,9 @@
-<p>observation works!</p>
+<div *ngIf="observation">
+
+  <pre>{{observation | json}}</pre>
+
+</div>
+
+<div *ngIf="!observation">
+  <p>No observation</p>
+</div>
