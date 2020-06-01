@@ -8,6 +8,7 @@ import {CollectionMeta} from '../shared/collection-meta';
 import {Collection} from '../shared/collection';
 import {ApiFunctionsService} from '../shared/api-functions.service';
 import {HttpClient} from '@angular/common/http';
+import {deeplyRenameKeys} from '../shared/handy-utils';
 
 
 @Injectable({
@@ -42,18 +43,35 @@ export class ObservationService {
   }
 
 
+  getObservation(id: string, options: {populate?: string[]} = {}): Observable<Observation> {
+    const qs = this.apiFunctions.queryParamsObjectToString(options);
+    return this.http.get(`${environment.apiUrl}/observations/${id}${qs}`)
+    .pipe(
+      map((observation: Observation) => {
+        return this.formatObservationForApp(observation);
+      })
+    )
+  }
+
+
   formatObservationForApp(asJsonLd): Observation {
-    const forApp: Observation = cloneDeep(asJsonLd);
+
+    const forApp: Observation = deeplyRenameKeys(asJsonLd, {
+      '@id': 'id',
+      '@type': 'type'
+    });
+
     delete forApp['@context'];
-    forApp.id = forApp['@id'];
-    if (forApp['@type']) forApp.type = forApp['@type'];
+
     if (forApp.resultTime) {
       forApp.resultTime = new Date(forApp.resultTime);
     }
+
     if (forApp.phenomenonTime) {
       forApp.phenomenonTime.hasBeginning = new Date(forApp.phenomenonTime.hasBeginning);
       forApp.phenomenonTime.hasEnd = new Date(forApp.phenomenonTime.hasEnd);
     }
+    
     return forApp;
   }
 

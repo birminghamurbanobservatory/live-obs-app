@@ -9,6 +9,7 @@ export interface Observation {
   ancestorPlatforms?: any[];
   hasFeatureOfInterest?: any;
   observedProperty?: any;
+  aggregation?: any;
   disciplines?: any[];
   usedProcedures?: any[];
   inTimeseries?: string;

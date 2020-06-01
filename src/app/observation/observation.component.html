@@ -1,8 +1,38 @@
-<div *ngIf="observation">
+<div *ngIf="observation" >
 
-  <pre>{{observation | json}}</pre>
+  <div *ngIf="observation.observedProperty" class="flex justify-center">
+    <p>{{observation.observedProperty.label || observation.observedProperty.id}} is:</p>
+  </div>
+
+  <div *ngIf="observation.hasResult" class="flex justify-center">
+    <p class="text-6xl font-extrabold text-pink-500">
+      {{observation.hasResult.value}} 
+      <span *ngIf="observation.hasResult.unit.symbol">{{observation.hasResult.unit.symbol}}</span>
+    </p>
+  </div>
+
+  <div *ngIf="observation.aggregation && observation.aggregation.id === 'instant'">
+    <div class="flex justify-center">
+      <p>Observed {{observation.resultTime | timeago}}</p>
+    </div>
+    <div class="flex justify-center">
+      <p class="text-gray-600 text-sm">({{observation.resultTime | date: 'medium'}})</p>
+    </div>
+  </div>
+
+
+  <div *ngIf="observation.aggregation && observation.aggregation.id !== 'instant'" class="flex justify-center">
+    <p>This is the {{observation.aggregation.label}} observed between {{observation.phenomenonTime.hasBeginning | date: 'medium'}} and {{observation.phenomenonTime.hasEnd | date: 'medium'}}</p>
+  </div>
+
+
+
+  <div *ngIf="observation.location" class="mt-3">
+    <uo-location-viewer [geometryIn]="observation.location.geometry"></uo-location-viewer>
+  </div>
 
 </div>
+
 
 <div *ngIf="!observation">
   <p>No observation</p>

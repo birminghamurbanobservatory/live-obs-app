@@ -1,0 +1,12 @@
+
+<div *ngIf="geometryIn && !processGeometryFail">
+  <div id={{uniqueMapId}} class="location-viewer"></div>
+</div>
+
+<div *ngIf="!geometryIn">
+  <p>No location available</p>
+</div>
+
+<div *ngIf="processGeometryFail">
+  <p>Failed to process location</p>
+</div>
