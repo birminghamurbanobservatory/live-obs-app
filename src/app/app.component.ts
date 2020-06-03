@@ -68,7 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // First up get multiple unpopulated observations
     // I'm trying to get enough observations here to avoid seeing the same, frequently uploading, sensors over and over.
-    return this.getUnpopulatedObservations(15)
+    return this.getUnpopulatedObservations(30)
     .pipe(
       // flatMap allows you to chain observables
       flatMap((observations) => {
@@ -111,13 +111,19 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.obsService.getObservations({
       flags: {
         exists: false
+      },
+      valueType: {
+        in: ['number'] // let's stick to just numbers for the time being
+      },
+      inTimeseries: {
+        not: {
+          in: this.prevTimeseriesIds
+        }
       }
+      // Probably want to enable a disciplines_not_includes=instrumental query parameter.
     }, {
+      // We basically want to get enough observations, so that when the page loads and we pick one at random, there's a good chance it's an observation they haven't seen before.
       limit: nObservations,
-      // TODO: Is there a way of having one per timeseries whilst also sorting by newest first? Not sure there is because the SQL involves a DISTINCT ON query which means the ORDER BY can only be by the timeseries, not the result_time.
-      // The issue currently is that the order is pretty much always the same, based upon the timeseries id in the database.
-      // You could just omit the onePer, but you could end up with issues is you ever have a sensor that spits out new data every second, it could completely dominate the available observations unless you find a way of adding a query parameter that excludes certain timeseries.
-      // onePer: 'timeseries'
     })
     .pipe(
       map((observationCollection) => {
@@ -158,7 +164,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   selectGoodObservation(observations: Observation[], prevTimeseriesIds: string[]): Observation {
 
-    // TODO: If you find observations from the same deployment keep appearing then you may also want to get preference to observations from deployments you haven't seen recently.
+    // TODO: If you find observations from the same deployment keep appearing then you may also want to give preference to observations from deployments you haven't seen recently.
 
     if (!observations.length) {
       throw new Error('No observation to select from');
@@ -167,6 +173,7 @@ export class AppComponent implements OnInit, OnDestroy {
     let selectedObservation;
 
     const obsFromFreshTimeseries = observations.filter((obs) => {
+      // Now that we exclude recently seen timeseries when making the HTTP request we should find that every observation we get back is from a fresh timeseries.
       return !(prevTimeseriesIds.includes(obs.inTimeseries));
     })
 
@@ -225,8 +232,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
 
   updatePrevTimeseriesIds(newTimeseriesId) {
-    if (this.prevTimeseriesIds.length > 200) {
+    if (this.prevTimeseriesIds.length > 50) {
       // This stops the array from getting too long if someone leaves the page running for ages.
+      // You'll want to make sure this is less than the total number of timeseries publically available.
       this.prevTimeseriesIds.shift();
     }
     this.prevTimeseriesIds.push(newTimeseriesId);

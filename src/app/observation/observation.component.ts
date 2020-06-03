@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import {Observation} from './observation';
+import {isNumber} from 'lodash';
 
 @Component({
   selector: 'app-observation',
@@ -15,6 +16,10 @@ export class ObservationComponent implements OnInit {
   ngOnInit(): void {
   }
 
+
+  isNumber(x) {
+    return isNumber(x);
+  }
 
 
 

@@ -27,11 +27,29 @@ export class ApiFunctionsService {
     Object.keys(obj).forEach((key) => {
       if (isObject(obj[key]) && !isArray(obj[key])) {
         Object.keys(obj[key]).forEach((modKey) => {
+
           if (modKey === 'in') {
             elements.push(`${key}__${modKey}=${obj[key][modKey].join(',')}`);
+          
+          } else if (modKey === 'not') {
+            if (isObject(obj[key][modKey])) {
+              Object.keys(obj[key][modKey]).forEach((notModKey) => {
+                if (notModKey === 'in') {
+                  if (obj[key][modKey][notModKey].length) {
+                    elements.push(`${key}__not__${notModKey}=${obj[key][modKey][notModKey].join(',')}`);
+                  }
+                } else {
+                  elements.push(`${key}__not__${notModKey}=${obj[key][modKey][notModKey]}`);
+                }
+              });
+            } else {
+              elements.push(`${key}__not=${obj[key][modKey]}`);
+            }
+
           } else {
             elements.push(`${key}__${modKey}=${obj[key][modKey]}`);
           }
+
         });
       } else if (isArray(obj[key])) {
         const separator = arraysThatNeedDotSeparation.includes(key) ? '.' : ',';

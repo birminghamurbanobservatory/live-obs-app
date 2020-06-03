@@ -23,7 +23,7 @@ export class ObservationService {
 
 
   getObservations(
-    where: {} = {}, 
+    where: {inTimeseries?: any; valueType?: any; flags?: any} = {}, 
     options: {limit?: number; offset?: number; sortBy?: string; sortOrder?: string; onePer?: string; populate?: string[]} = {}
   ): Observable<{data: Observation[], meta: CollectionMeta}> {
 

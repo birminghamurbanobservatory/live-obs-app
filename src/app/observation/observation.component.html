@@ -1,34 +1,82 @@
 <div *ngIf="observation" >
 
-  <div *ngIf="observation.observedProperty" class="flex justify-center">
-    <p>{{observation.observedProperty.label || observation.observedProperty.id}} is:</p>
+  <!-- Observed property -->
+  <div *ngIf="observation.observedProperty" class="my-3">
+    <p class="text-center font-semibold">{{observation.observedProperty.label || observation.observedProperty.id}} is:</p>
   </div>
 
-  <div *ngIf="observation.hasResult" class="flex justify-center">
-    <p class="text-6xl font-extrabold text-pink-500">
+  <!-- value and unit -->
+  <div *ngIf="observation.hasResult" class="my-3">
+    <p class="text-4xl md:text-6xl font-extrabold text-pink-500 text-center">
       {{observation.hasResult.value}} 
       <span *ngIf="observation.hasResult.unit.symbol">{{observation.hasResult.unit.symbol}}</span>
     </p>
   </div>
 
-  <div *ngIf="observation.aggregation && observation.aggregation.id === 'instant'">
-    <div class="flex justify-center">
-      <p>Observed {{observation.resultTime | timeago}}</p>
+  <!-- instant result time -->
+  <div *ngIf="observation.aggregation && observation.aggregation.id === 'instant'" class="my-3">
+    <div>
+      <p class="text-center">Observed {{observation.resultTime | timeago}}</p>
     </div>
-    <div class="flex justify-center">
-      <p class="text-gray-600 text-sm">({{observation.resultTime | date: 'medium'}})</p>
+    <div>
+      <p class="text-gray-600 text-sm text-center">({{observation.resultTime | date: 'medium'}})</p>
     </div>
   </div>
 
-
-  <div *ngIf="observation.aggregation && observation.aggregation.id !== 'instant'" class="flex justify-center">
-    <p>This is the {{observation.aggregation.label}} observed between {{observation.phenomenonTime.hasBeginning | date: 'medium'}} and {{observation.phenomenonTime.hasEnd | date: 'medium'}}</p>
+  <!-- Time window -->
+  <div *ngIf="observation.aggregation && observation.aggregation.id !== 'instant'" class="my-3">
+    <p class="text-center">
+      This is the <span class="font-semibold">{{observation.aggregation.label}}</span> observed between 
+      <span class="font-semibold">{{observation.phenomenonTime.hasBeginning | date: 'h:mm a'}}</span>
+      ({{observation.phenomenonTime.hasBeginning | date: 'MMM d, y'}}) 
+      and  
+      <span class="font-semibold">{{observation.phenomenonTime.hasEnd | date: 'h:mm a'}}</span>
+      ({{observation.phenomenonTime.hasEnd | date: 'MMM d, y'}}).
+    </p>
   </div>
 
+  <!-- feature of interest -->
+  <div *ngIf="observation.hasFeatureOfInterest" class="my-3">
+    <p class="text-center">
+      Feature of interest: <span class="italic">{{observation.hasFeatureOfInterest.label}}</span>
+    </p>
+  </div>
 
+  <!-- sensor/platform/deployment -->
+  <div *ngIf="observation.madeBySensor" class="my-3">
+    <p class="text-center">
+      Made by sensor <span class="italic">{{observation.madeBySensor.label}}</span>
+      <span *ngIf="observation.ancestorPlatforms">
+        <span *ngFor="let platform of observation.ancestorPlatforms.slice().reverse()">
+          which is hosted by <span class="italic">{{platform.label}}</span>
+        </span>
+      </span>
+      <span *ngIf="observation.hasDeployment">
+        in the deployment <span class="italic">{{observation.hasDeployment.label}}</span>
+      </span>.
+    </p>
+  </div>
 
-  <div *ngIf="observation.location" class="mt-3">
+  <!-- location -->
+  <div *ngIf="observation.location" class="mt-6">
     <uo-location-viewer [geometryIn]="observation.location.geometry"></uo-location-viewer>
+  </div>
+
+  <!-- height -->
+  <div *ngIf="observation.location && isNumber(observation.location.properties.height)" class="my-3">
+    <p class="text-center">
+      At a height of {{observation.location.properties.height}} m.
+    </p>
+  </div>
+
+  <!-- disciplines -->
+  <div *ngIf="observation.disciplines && observation.disciplines.length" class="my-3">
+    <p class="text-center text-gray-600">
+      Useful to the following disciplines
+    </p>
+    <p *ngFor="let discipline of observation.disciplines" class="text-center">
+      {{discipline.label}}
+    </p>
   </div>
 
 </div>
