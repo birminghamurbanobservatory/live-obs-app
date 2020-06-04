@@ -3,19 +3,35 @@
 
 <div class="container">
 
-  <!-- Fix the height of this so it doesn't move everything ever time is appears -->
-  <div class="my-3 flex justify-center text-teal-500">
-    <p *ngIf="updatingIn" class="font-bold">Updating in {{updatingIn}}</p>
-    <p *ngIf="!updatingIn">&nbsp;</p>
+  <div *ngIf="errorMessage" class="my-4">
+    <p class="text-center text-red-500">Whoops. {{errorMessage}}</p>
   </div>
 
-  <div *ngIf="errorMessage">
-    <p>Whoops. {{errorMessage}}</p>
+  <div *ngIf="!errorMessage">
+
+    <div class="flex justify-between items-center mt-3">
+
+      <div class="flex justify-center text-teal-500">
+        <p *ngIf="updatingIn" class="font-bold">Updating in {{updatingIn}}</p>
+        <p *ngIf="!updatingIn">&nbsp;</p> <!-- helps fix the height -->
+      </div>
+
+      <!-- play/pause -->
+      <div class="flex justify-end">
+        <button *ngIf="playing" (click)="pause()"><i class="material-icons text-5xl text-teal-500">pause</i></button>
+        <button *ngIf="!playing" (click)="play()"><i class="material-icons text-5xl text-teal-500">play_arrow</i></button>
+      </div>
+
+    </div>
+
+
+
+    <div *ngIf="currentObservation">
+      <app-observation [observation]="currentObservation"></app-observation>
+    </div>
+
   </div>
 
-  <div *ngIf="currentObservation">
-    <app-observation [observation]="currentObservation"></app-observation>
-  </div>
 
 
 </div>

@@ -25,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   updatingIn = '';
   private googleMapsApi;
   errorMessage = '';
+  playing = true;
 
 
   constructor(
@@ -36,7 +37,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.logger.debug(`${this.constructor.name} is initialising`);
 
-    // TODO: Need to handle if this errors, and show error message to user.
+    // Start the loop
+    this.play();
+
+  }
+
+
+  play() {
+    this.logger.debug('Playing');
+    this.playing = true;
+
     this.setPendingObservation()
     .pipe(
       catchError((err): any => {
@@ -58,7 +68,14 @@ export class AppComponent implements OnInit, OnDestroy {
       this.pauseThenSetPendingObservation();
 
     })
+  }
 
+
+  pause() {
+    this.logger.debug('Pause');
+    this.playing = false;
+    this.updatingIn = '';
+    this.unsubscribeFromCountdownTimer();
   }
 
 
@@ -77,7 +94,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (!observationsToSelectFrom.length) {
           throwError('No observations to select from.');
         }
-        const goodObservation = this.selectGoodObservation(observationsToSelectFrom, this.prevTimeseriesIds);
+        const goodObservation = this.selectGoodObservation(observationsToSelectFrom);
 
         return this.getPopulatedObservation(goodObservation.id);
 
@@ -99,7 +116,9 @@ export class AppComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$)
     ).subscribe(() => {
       // Although we don't need to do anything with the subscribe function here, we still need it otherwise the observable inside the getRecentObservations function won't complete.
-      this.setPendingObservation().subscribe(() => {});
+      this.setPendingObservation().subscribe(() => {
+        this.errorMessage = '';
+      });
     })
   }
 
@@ -107,6 +126,8 @@ export class AppComponent implements OnInit, OnDestroy {
   getUnpopulatedObservations(nObservations = 10): Observable<Observation[]> {
 
     this.logger.debug('Getting unpopulated observations');
+
+    // TODO: Add the ability to add a query parameter hasDeployment__not in order to prevent observations from the same deployment from being shown consecutively.
 
     return this.obsService.getObservations({
       flags: {
@@ -162,9 +183,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
 
-  selectGoodObservation(observations: Observation[], prevTimeseriesIds: string[]): Observation {
-
-    // TODO: If you find observations from the same deployment keep appearing then you may also want to give preference to observations from deployments you haven't seen recently.
+  selectGoodObservation(observations: Observation[]): Observation {
 
     if (!observations.length) {
       throw new Error('No observation to select from');
@@ -172,23 +191,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
     let selectedObservation;
 
-    const obsFromFreshTimeseries = observations.filter((obs) => {
-      // Now that we exclude recently seen timeseries when making the HTTP request we should find that every observation we get back is from a fresh timeseries.
-      return !(prevTimeseriesIds.includes(obs.inTimeseries));
+    const goodObservations = observations.filter((obs) => {
+      // Haven't been able to think of a good filter now that I can use __not query parameters.
+      return true;
     })
 
-    if (obsFromFreshTimeseries.length) {
-      this.logger.debug(`${obsFromFreshTimeseries.length} fresh timeseries to pick from.`);
-      const idx = random(0, Math.max(obsFromFreshTimeseries.length - 1, 0));
-      selectedObservation = obsFromFreshTimeseries[idx];
+    if (goodObservations.length) {
+      this.logger.debug(`${goodObservations.length} good observations to pick from.`);
+      const idx = random(0, Math.max(goodObservations.length - 1, 0));
+      selectedObservation = goodObservations[idx];
 
     } else {
-      this.logger.debug(`Resorting to an already used timeseries`);
+      this.logger.debug(`Resorting to an non-good observation`);
       const idx = random(0, Math.max(observations.length - 1, 0));
       selectedObservation = observations[idx];
     };
 
-    this.logger.debug(`Selected observation ${selectedObservation.id} (timeseries: ${selectedObservation.inTimeseries})`)
+    this.logger.debug(`Selected observation ${selectedObservation.id}`)
       
     return selectedObservation;
   }
@@ -196,8 +215,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   beginCountdown() {
 
-    // Cancel any previous subscriptions..
-    this.unsubscribeFromCountdownTimer();
+    // Reset out unsubscriber
+    this.countdownTimerUnsubscribe$ = new Subject();
 
     this.logger.debug('Beginning countdown');
 
