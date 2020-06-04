@@ -127,25 +127,38 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.logger.debug('Getting unpopulated observations');
 
-    // TODO: Add the ability to add a query parameter hasDeployment__not in order to prevent observations from the same deployment from being shown consecutively.
-
-    return this.obsService.getObservations({
+    const where: any = {
       flags: {
         exists: false
       },
       valueType: {
         in: ['number'] // let's stick to just numbers for the time being
-      },
-      inTimeseries: {
+      }      
+    }
+
+    // Prevent observations from the same timeseries appearing too often
+    if (this.prevTimeseriesIds.length > 0) {
+      where.inTimeseries = {
         not: {
           in: this.prevTimeseriesIds
         }
       }
-      // Probably want to enable a disciplines_not_includes=instrumental query parameter.
-    }, {
+    }
+
+    // Prevent observations from the same deployment being shown consecutively.
+    // This relies on there being more than one deployment. Otherwise it won't be able to get any observations.
+    if (this.currentObservation && this.currentObservation.hasDeployment) {
+      where.hasDeployment = {
+        not: this.currentObservation.hasDeployment.id
+      }
+    }
+
+    const options = {
       // We basically want to get enough observations, so that when the page loads and we pick one at random, there's a good chance it's an observation they haven't seen before.
-      limit: nObservations,
-    })
+      limit: nObservations
+    };
+
+    return this.obsService.getObservations(where, options)
     .pipe(
       map((observationCollection) => {
         return observationCollection.data;

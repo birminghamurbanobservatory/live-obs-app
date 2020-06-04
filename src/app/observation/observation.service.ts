@@ -30,6 +30,8 @@ export class ObservationService {
     const queryParamsObject = Object.assign({}, where, options);
     const qs = this.apiFunctions.queryParamsObjectToString(queryParamsObject);
 
+    console.log(qs);
+
     return this.http.get(`${environment.apiUrl}/observations${qs}`)
     .pipe(
       map((obsCollection: Collection) => {
