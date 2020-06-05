@@ -131,6 +131,10 @@ export class AppComponent implements OnInit, OnDestroy {
       flags: {
         exists: false
       },
+      location: {
+        // We only want observations with a location otherwise the google map component needs to be reloaded everytime an observation with a location follows one without. Each time the map is reloaded it counts against your 'Maps Javascipt API' quota, so we wasnt to avoid doing this as much as possible.
+        exists: true
+      },
       valueType: {
         in: ['number'] // let's stick to just numbers for the time being
       }      
