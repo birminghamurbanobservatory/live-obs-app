@@ -23,6 +23,8 @@ export class LocationViewerComponent implements OnInit, OnChanges {
 
   ngOnInit() {
 
+    this.logger.debug(`ngOnInit running in ${this.constructor.name}`);
+
     GoogleMapsLoader.load()
     .then((googleMapsApi) => {
       this.logger.debug('Google Maps Loaded');
