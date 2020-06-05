@@ -75,8 +75,6 @@ export class LocationViewerComponent implements OnInit, OnChanges {
       this.logger.error(err);
     }
 
-    console.log(geoJsonCenterPoint);
-
     this.map.setCenter({
       lng: geoJsonCenterPoint.geometry.coordinates[0],
       lat: geoJsonCenterPoint.geometry.coordinates[1]
