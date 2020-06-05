@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build --prod",
     "deploy": "firebase deploy -m $npm_package_version",
+    "build:deploy": "npm run build && npm run deploy",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

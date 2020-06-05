@@ -21,6 +21,10 @@ export class ObservationComponent implements OnInit {
     return isNumber(x);
   }
 
+  absolute(x: number) {
+    return Math.abs(x);
+  }
+
 
 
 }

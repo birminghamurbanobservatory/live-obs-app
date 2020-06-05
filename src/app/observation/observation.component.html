@@ -65,7 +65,7 @@
   <!-- height -->
   <div *ngIf="observation.location && isNumber(observation.location.properties.height)" class="my-3">
     <p class="text-center">
-      At a height of {{observation.location.properties.height}} m.
+      At a {{observation.location.properties.height < 0 ? 'depth' : 'height'}} of {{absolute(observation.location.properties.height)}} m.
     </p>
   </div>
 
