@@ -2,3 +2,21 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+
+// This worked better in here than in header.component.scss, in particular the '@apply block' bit.
+// Technically this should go before the line "@import 'tailwindcss/utilities';", but it caused an error.
+// https://tailwindcss.com/docs/extracting-components
+.header-link {
+  @apply no-underline;
+  @apply block;
+  @apply mt-1;
+  @apply mr-3;
+  @apply py-2;
+  @apply px-3;
+  @apply rounded;
+  @apply text-white;
+  @apply font-medium; /* weight */
+  @apply text-sm; /* size */
+}
+
