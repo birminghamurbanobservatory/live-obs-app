@@ -137,7 +137,10 @@ export class AppComponent implements OnInit, OnDestroy {
       },
       valueType: {
         in: ['number'] // let's stick to just numbers for the time being
-      }      
+      },
+      disciplines: {
+        not: ['instrumental'] // don't want observations whose only discipline is instrumental, e.g. battery, signal readings
+      }  
     }
 
     // Prevent observations from the same timeseries appearing too often

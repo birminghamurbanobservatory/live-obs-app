@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {isObject, isArray} from 'lodash';
+import * as check from 'check-types';
 
 
 @Injectable({
@@ -25,14 +25,14 @@ export class ApiFunctionsService {
 
     const elements = [];
     Object.keys(obj).forEach((key) => {
-      if (isObject(obj[key]) && !isArray(obj[key])) {
+      if (check.object(obj[key])) {
         Object.keys(obj[key]).forEach((modKey) => {
 
           if (modKey === 'in') {
             elements.push(`${key}__${modKey}=${obj[key][modKey].join(',')}`);
           
           } else if (modKey === 'not') {
-            if (isObject(obj[key][modKey])) {
+            if (check.object(obj[key][modKey])) {
               Object.keys(obj[key][modKey]).forEach((notModKey) => {
                 if (notModKey === 'in') {
                   if (obj[key][modKey][notModKey].length) {
@@ -42,6 +42,9 @@ export class ApiFunctionsService {
                   elements.push(`${key}__not__${notModKey}=${obj[key][modKey][notModKey]}`);
                 }
               });
+            } else if (check.array(obj[key][modKey])) {
+              const separator = arraysThatNeedDotSeparation.includes(key) ? '.' : ',';
+              elements.push(`${key}__not=${obj[key][modKey].join(separator)}`);
             } else {
               elements.push(`${key}__not=${obj[key][modKey]}`);
             }
@@ -51,7 +54,7 @@ export class ApiFunctionsService {
           }
 
         });
-      } else if (isArray(obj[key])) {
+      } else if (check.array(obj[key])) {
         const separator = arraysThatNeedDotSeparation.includes(key) ? '.' : ',';
         elements.push(`${key}=${obj[key].join(separator)}`);
       } else {
